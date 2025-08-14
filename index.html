@@ -90,7 +90,8 @@
         const ctx = canvas.getContext('2d');
 
         // URL du serveur Render
-        const ws = new WebSocket("wss://ton-app-render.onrender.com/ws");
+        const ws = new WebSocket("wss://scorpion-detector-backend.onrender.com/ws");
+
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
