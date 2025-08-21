@@ -65,10 +65,25 @@
             color: #00ff00; font-size: 24px; font-weight: 700; text-transform: uppercase;
             letter-spacing: 3px; text-shadow: 0 0 10px rgba(0,255,0,0.5); z-index: 30; opacity: 0.8;
         }
-        @media (max-width: 768px) {
-            .title { font-size: 18px; letter-spacing: 2px; }
-            .corner { width: 20px; height: 20px; }
-            .status-indicator { top: 10px; right: 10px; font-size: 10px; padding: 6px 12px; }
+        .switch-btn {
+            position: fixed; bottom: 20px; left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #00ff00;
+            border-radius: 20px;
+            color: #00ff00;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 10px 20px;
+            cursor: pointer;
+            z-index: 40;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        .switch-btn:hover {
+            background: #00ff00;
+            color: #000;
         }
     </style>
 </head>
@@ -83,13 +98,14 @@
 
     <video id="video" autoplay muted playsinline></video>
     <canvas id="canvas"></canvas>
+    <button class="switch-btn" id="switchCam">Changer caméra</button>
 
     <script>
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
+        let currentFacingMode = "environment"; // démarre sur caméra arrière
 
-        // Connexion WebSocket au backend
         const ws = new WebSocket("wss://scorpion-detector-backend.onrender.com/ws");
 
         ws.onmessage = (event) => {
@@ -113,9 +129,8 @@
 
         async function initCamera() {
             try {
-                // 👉 caméra arrière forcée
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: { exact: "environment" } },
+                    video: { facingMode: currentFacingMode },
                     audio: false
                 });
                 video.srcObject = stream;
@@ -129,6 +144,13 @@
             }
         }
 
+        function stopCamera() {
+            const stream = video.srcObject;
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        }
+
         function sendFrames() {
             setInterval(() => {
                 ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -139,6 +161,12 @@
                 }, 'image/jpeg', 0.7);
             }, 200);
         }
+
+        document.getElementById("switchCam").addEventListener("click", () => {
+            stopCamera();
+            currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
+            initCamera();
+        });
 
         initCamera();
     </script>
