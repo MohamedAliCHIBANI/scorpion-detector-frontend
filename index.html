@@ -89,10 +89,8 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
 
-        // URL du serveur Render
+        // Connexion WebSocket au backend
         const ws = new WebSocket("wss://scorpion-detector-backend.onrender.com/ws");
-
-
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
@@ -115,7 +113,11 @@
 
         async function initCamera() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                // 👉 caméra arrière forcée
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: { exact: "environment" } },
+                    audio: false
+                });
                 video.srcObject = stream;
                 video.onloadedmetadata = () => {
                     canvas.width = video.videoWidth;
