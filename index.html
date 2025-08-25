@@ -105,8 +105,8 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         let currentFacingMode = "environment"; // démarre sur caméra arrière
-
-        const ws = new WebSocket("wss://scorpion-detector-backend.onrender.com/ws");
+        
+        const ws = new WebSocket("ws://192.168.1.21:8000/ws");
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
