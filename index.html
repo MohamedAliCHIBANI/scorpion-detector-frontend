@@ -177,8 +177,8 @@
         const ctx = canvas.getContext('2d');
 
         // Détecter si on est en HTTPS pour utiliser WSS
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const ws = new WebSocket(`${protocol}//192.168.1.21:8000/ws`);
+    
+        const ws = new WebSocket("wss://scorpion-detector-backend.onrender.com/ws");
 
         ws.onopen = () => {
             console.log('WebSocket connecté');
