@@ -104,7 +104,7 @@
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        let currentFacingMode = "environment"; // démarre sur caméra arrière
+        let currentFacingMode = "user"; // démarre sur caméra arrière
 
         const ws = new WebSocket("ws:// 192.168.1.21:8000/ws");
 
