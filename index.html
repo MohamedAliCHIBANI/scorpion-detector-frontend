@@ -170,6 +170,7 @@
     <div class="status-indicator">Active</div>
     <video id="video" autoplay muted playsinline></video>
     <canvas id="canvas"></canvas>
+    <button class="switch-btn" id="switchCam">Changer caméra</button>
 
     <script>
         const video = document.getElementById('video');
@@ -200,7 +201,10 @@
 
         async function initCamera() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: currentFacingMode },
+                    audio: false
+                });
                 video.srcObject = stream;
                 video.onloadedmetadata = () => {
                     canvas.width = video.videoWidth;
@@ -209,6 +213,13 @@
                 };
             } catch (err) {
                 alert("Erreur accès caméra : " + err);
+            }
+        }
+
+        function stopCamera() {
+            const stream = video.srcObject;
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
             }
         }
 
@@ -222,6 +233,12 @@
                 }, 'image/jpeg', 0.7);
             }, 200);
         }
+
+        document.getElementById("switchCam").addEventListener("click", () => {
+            stopCamera();
+            currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
+            initCamera();
+        });
 
         initCamera();
     </script>
