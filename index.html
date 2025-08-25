@@ -170,7 +170,6 @@
     <div class="status-indicator">Active</div>
     <video id="video" autoplay muted playsinline></video>
     <canvas id="canvas"></canvas>
-    <button class="switch-btn" id="switchCam">Changer caméra</button>
 
     <script>
         const video = document.getElementById('video');
@@ -186,9 +185,9 @@
             
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             ctx.lineWidth = 2;
-            ctx.strokeStyle = "#3b82f6"; // Changé de "lime" vers bleu
+            ctx.strokeStyle = "#3b82f6";
             ctx.font = "16px Arial";
-            ctx.fillStyle = "#3b82f6"; // Changé de "lime" vers bleu
+            ctx.fillStyle = "#3b82f6";
             
             detections.forEach(det => {
                 const [x1, y1, x2, y2] = det.bbox;
@@ -202,7 +201,9 @@
         async function initCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: currentFacingMode },
+                    video: { 
+                        facingMode: "environment" // Force la caméra arrière
+                    },
                     audio: false
                 });
                 video.srcObject = stream;
@@ -212,14 +213,8 @@
                     sendFrames();
                 };
             } catch (err) {
-                alert("Erreur accès caméra : " + err);
-            }
-        }
-
-        function stopCamera() {
-            const stream = video.srcObject;
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
+                console.error("Erreur accès caméra : ", err);
+                alert("Erreur accès caméra : " + err.message);
             }
         }
 
@@ -228,18 +223,15 @@
                 ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                 canvas.toBlob(blob => {
                     blob.arrayBuffer().then(buffer => {
-                        if (ws.readyState === WebSocket.OPEN) ws.send(buffer);
+                        if (ws.readyState === WebSocket.OPEN) {
+                            ws.send(buffer);
+                        }
                     });
                 }, 'image/jpeg', 0.7);
             }, 200);
         }
 
-        document.getElementById("switchCam").addEventListener("click", () => {
-            stopCamera();
-            currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
-            initCamera();
-        });
-
+        // Initialiser la caméra au chargement de la page
         initCamera();
     </script>
 </body>
